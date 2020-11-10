@@ -1,19 +1,15 @@
 package com.googlecalculator.base;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+
+import com.googlecalculator.utils.PropertyUtility;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
@@ -23,39 +19,13 @@ public class BaseClass
 {
 	//Instance of driver that drive the test cases running
 	public static AppiumDriver<MobileElement> driver;
-	public static Properties prop;
-
-	public BaseClass()
-	{
-		prop = new Properties();
-		String currentPath = Paths.get(".").toAbsolutePath().normalize().toString();
-		String propertiesPath = currentPath + "\\src\\test\\resources\\config.properties";
-		FileInputStream fis = null;
-		;
-		try
-		{
-			fis = new FileInputStream(propertiesPath);
-		} catch (FileNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try
-		{
-			prop.load(fis);
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
+	
 	@BeforeTest
 	public void initialize() throws MalformedURLException
 	{
 		DesiredCapabilities desCap = new DesiredCapabilities();
 		initializeDesiredCapabilities(desCap);
-		String server = prop.getProperty("url");
+		String server = PropertyUtility.getProperty("url");
 		URL url = new URL(server);
 		driver = new AppiumDriver<MobileElement>(url, desCap);
 	}
@@ -66,15 +36,14 @@ public class BaseClass
      * @param 	desiredCapabilities		Instance of desired Capabilities passed
      */
 	private void initializeDesiredCapabilities(DesiredCapabilities desCap) {
-		String currentPath = Paths.get(".").toAbsolutePath().normalize().toString();
-		String deviceName = prop.getProperty("deviceName");
-		String udid = prop.getProperty("udid");
-		String platformName = prop.getProperty("platformName");
-		String platformVersion = prop.getProperty("platformVersion");
-		String timeout = prop.getProperty("implicitwait");
-		String appPath = currentPath + "\\src\\test\\resources\\" + prop.getProperty("app");
-		String appPackage = prop.getProperty("appPackage");
-		String appActivity = prop.getProperty("appActivity");
+		String deviceName = PropertyUtility.getProperty("deviceName");
+		String udid = PropertyUtility.getProperty("udid");
+		String platformName = PropertyUtility.getProperty("platformName");
+		String platformVersion = PropertyUtility.getProperty("platformVersion");
+		String appPath =PropertyUtility.getProperty("app");
+		String appPackage = PropertyUtility.getProperty("appPackage");
+		String appActivity = PropertyUtility.getProperty("appActivity");
+		String timeout = PropertyUtility.getProperty("implicitWait", "30");
 	
 		desCap.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
 		desCap.setCapability(MobileCapabilityType.UDID, udid);
@@ -94,7 +63,7 @@ public class BaseClass
 	}
 
 	@AfterTest
-	public void tearDown()
+	private void tearDown()
 	{
 		driver.quit();
 	}
